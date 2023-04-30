@@ -11,8 +11,8 @@ from sqlalchemy import text
 
 
 
-START_CRN = 30000
-END_CRN = 30010
+START_CRN = 10000
+END_CRN = 99999
 
 
 def main():
