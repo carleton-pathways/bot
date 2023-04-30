@@ -17,28 +17,17 @@ def main():
 
     soup = BeautifulSoup(html, "html.parser")
     secondtable = soup.findAll('table')[1]
-
-
     
     info_dict = {}
 
-    info_dict["term"] = driver.find_element(By.XPATH, "//td[contains(., 'Registration Term:')]//following-sibling::td").text
-    info_dict["courseCode"] = driver.find_element(By.XPATH, "//td[contains(., 'Subject:')]//following-sibling::td").text
-    info_dict["crn"] = driver.find_element(By.XPATH, "//td[contains(., 'CRN:')]//following-sibling::td").text
-    info_dict["title"] = driver.find_element(By.XPATH, "//td[contains(., 'Title:')]//following-sibling::td").text
-    info_dict["description"] = driver.find_element(By.XPATH, "//td[contains(., 'Course Description:')]//following-sibling::td").text
-    info_dict["credit"] = driver.find_element(By.XPATH, "//td[contains(., 'Course Credit Value:')]//following-sibling::td").text
-    info_dict["schedule_type"] = driver.find_element(By.XPATH, "//td[contains(., 'Schedule Type:')]//following-sibling::td").text
-    info_dict["status"] = driver.find_element(By.XPATH, "//td[contains(., 'Status:')]//following-sibling::td").text
-    info_dict["section_information"] = driver.find_element(By.XPATH, "//td[contains(., 'Section Information:')]//following-sibling::td").text
-    info_dict["year_in_program"] = driver.find_element(By.XPATH, "//td[contains(., 'Year in Program:')]//following-sibling::td").text
-    info_dict["level_restriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Level Restriction:')]//following-sibling::td").text
-    info_dict["degree_restriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Degree Restriction:')]//following-sibling::td").text
-    info_dict["major_restriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Major Restriction:')]//following-sibling::td").text
-    info_dict["program_restriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Program Restrictions:')]//following-sibling::td").text
-    info_dict["department_restriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Department Restriction:')]//following-sibling::td").text
-    info_dict["faculty_resitriction"] = driver.find_element(By.XPATH, "//td[contains(., 'Faculty Restriction:')]//following-sibling::td").text
+    term_array = ['Registration Term', 'Subject', 'CRN', 'Title', 'Course Description', 'Course Credit Value', 'Schedule Type', 'Status', 'Section Information', 'Year in Program',
+                  'Level Restriction', 'Degree Restriction', 'Major Restriction', 'Program Restrictions', 'Department Restriction', 'Faculty Restriction',]
+    
+    # finds everything in first table
+    for term in term_array:
+        info_dict[(term.replace(" ", "_")).lower()] = driver.find_element(By.XPATH, "//td[contains(., '%s:')]//following-sibling::td"%(term)).text
 
+    # finds everything in second table
     for i, col in enumerate(secondtable.find_all("tr")[1].find_all("td")):
         if (i == 0):
             info_dict["meeting_date"] = col.text
@@ -54,6 +43,8 @@ def main():
             info_dict["schedule"] = col.text
         elif (i == 6):
             info_dict["instructor"] = col.text
+
+
     print(info_dict)
 
 if __name__ == "__main__":
