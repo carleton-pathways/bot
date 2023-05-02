@@ -34,3 +34,6 @@ class DataParser:
             values["tut_id"] = None               
             
         return values
+    
+    def parse_meeting_times():
+        return 0
