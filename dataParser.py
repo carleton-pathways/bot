@@ -34,3 +34,24 @@ class DataParser:
             values["tut_id"] = None               
             
         return values
+    
+    def parse_days(self,section_information=""):
+        days_dict ={
+            "Mon":"Monday",
+            "Tue":"Tuesday",
+            "Wed":"Wednesday",
+            "Thu":"Thursday",
+            "Fri":"Friday",
+            "Sat":"Saturday",
+            "Sun":"Sunday",
+        }
+
+        days_arr = section_information.split(" ")
+
+        #This is at most O(7) because only seven days in a week
+        for x in range(len(days_arr)):
+            if (not(days_arr[x] in days_dict)):
+                raise ValueError(f"Could not find {days_arr[x]} inside days")
+            days_arr[x]=days_dict[days_arr[x]]
+
+        return days_arr
