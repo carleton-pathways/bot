@@ -55,9 +55,4 @@ class DataParser:
         values["start_time"] = datetime.time(int(times[0].split(":")[0]), int(times[0].split(":")[1]), 0, 0)
         values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
-        
         return values
-    
-p = DataParser()
-
-print(p.parse_time(""))
