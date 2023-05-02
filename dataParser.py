@@ -1,3 +1,4 @@
+import datetime
 class DataParser: 
 
     #takes in a string of the course title and return a dictionary
@@ -35,5 +36,48 @@ class DataParser:
             
         return values
     
-    def parse_meeting_times():
-        return 0
+    def parse_meeting_times(self, meeting_times=""):
+        months_dict = {
+            "Jan": "1",
+            "Feb": "2",
+            "Mar": "3",
+            "Apr": "4",
+            "May": "5",
+            "Jun": "6",
+            "Jul": "7",
+            "Aug": "8",
+            "Sep": "9",
+            "Oct": "10",
+            "Nov": "11",
+            "Dec":"12"
+            
+            }
+   
+        # If there is no list of words, meaning empty string was passed in
+        if (len(meeting_times)==0):
+            raise ValueError("Empty string passed")
+        
+        meeting_dates= {}
+        year = meeting_times[8:13]
+
+
+        start_month = months_dict[meeting_times[0:3]]
+        start_day = meeting_times[4:6]
+        
+        end_month = months_dict[meeting_times[-6:-3]]
+        end_day = meeting_times[-2:]
+
+
+        if(not(start_month.isnumeric() & start_day.isnumeric() & end_month.isnumeric() & end_day.isnumeric())):
+            raise  ValueError("String does not follow the proper format")
+
+        start_date = datetime.datetime(int(year), int(start_month), int(start_day))
+        end_date = datetime.datetime(int(year), int(end_month), int(end_day))
+      
+        meeting_dates["start_date"]=start_date
+        meeting_dates["end_date"]=end_date
+
+    
+        return meeting_dates
+
+
