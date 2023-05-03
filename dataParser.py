@@ -1,4 +1,5 @@
 import datetime
+
 class DataParser: 
 
     #takes in a string of the course title and return a dictionary
@@ -36,6 +37,7 @@ class DataParser:
             
         return values
     
+
     def parse_meeting_times(self, meeting_times=""):
         months_dict = {
             "Jan": 1,
@@ -91,5 +93,52 @@ class DataParser:
       
         return meeting_dates
 
+
+
+
+    def parse_days(self,section_information=""):
+        days_dict ={
+            "Mon":"Monday",
+            "Tue":"Tuesday",
+            "Wed":"Wednesday",
+            "Thu":"Thursday",
+            "Fri":"Friday",
+            "Sat":"Saturday",
+            "Sun":"Sunday",
+        }
+
+        if(section_information==""):
+            raise ValueError("No day information was found")
+
+        days_arr = section_information.split(" ")
+
+        #This is at most O(7) because only seven days in a week
+        for x in range(len(days_arr)):
+            if (not(days_arr[x] in days_dict)):
+                raise ValueError(f"Could not find {days_arr[x]} inside days")
+            
+            days_arr[x]=days_dict[days_arr[x]]
+
+        return days_arr
+
+    def parse_time(self, time=""):
+        
+        # If there is no list of words, meaning empty string was passed in
+        if (time == ""):
+            raise ValueError("Empty string passed")
+        
+        times = time.split("-")
+
+        # If there is an invalid amount of '-'s
+        if (len(times) != 2):
+            raise TypeError("Invalid format: requires one and only one '-'")
+        
+        times = [time.strip() for time in times]
+
+        values = {}
+        values["start_time"] = datetime.time(int(times[0].split(":")[0]), int(times[0].split(":")[1]), 0, 0)
+        values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
+        
+        return values
 
 
