@@ -35,5 +35,25 @@ class DataParser:
 
         return values
 
-    def parse1():
-        return 0
+    # takes in a string which would represent a data containing an exlusion or inclusion
+    # array contains the subject and whether it is excluded or included
+
+    def parseRestrictionExclusion(dataString):
+        result = []
+        if (dataString == "{None}"):
+            return "null"
+
+        bracketIndex = dataString.index("(")
+        result.append(dataString[:bracketIndex])
+        result.append(dataString[bracketIndex+1:-1])
+        return result
+
+    def parseInstructor(instructor):
+        result = []
+        if (instructor == "{None}"):
+            return "null"
+
+        bracketIndex = instructor.index("(")
+        result.append(instructor[:bracketIndex])
+        result.append(instructor[bracketIndex+1:-1])
+        return result
