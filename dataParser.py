@@ -60,6 +60,8 @@ class DataParser:
 
     
     def parse_additional_credit_data(self, section_information=""):
+        if section_information=="":
+            raise ValueError("empty string")
         initial_index = section_information.find("Precludes additional credit for ")
         if initial_index == -1:
             return []
@@ -67,4 +69,9 @@ class DataParser:
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
         prereqs = prereqs.split(", ")
+
+        for i in range(len(prereqs)):
+            if (" (this course is no longer" in prereqs[i]):
+                prereqs[i] = prereqs[i][:prereqs[i].find(" (this course is no longer")]
+
         return prereqs
