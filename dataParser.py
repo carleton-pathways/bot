@@ -1,4 +1,5 @@
 import datetime
+import re
 
 class DataParser: 
 
@@ -141,4 +142,19 @@ class DataParser:
         
         return values
 
+    
+    def parse_prereq_data(self, section_information=""):
+        initial_index = section_information.find("Prerequisite(s):")
+        if initial_index == -1:
+            return None
+        initial_index+=len("Prerequisite(s):")
+        end_index = section_information.find(".", initial_index)
+        prereqs = section_information[initial_index:end_index]
+        pattern = re.compile(r"[A-Z]{4}\s\d{4}")
+        course_codes = pattern.findall(section_information)
+        values = {}
+        values["courses"] = course_codes
+        values["string"] = prereqs
+
+        return values
 
