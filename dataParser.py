@@ -57,12 +57,14 @@ class DataParser:
         values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
         return values
+
     
-    def parse_prereq_data(self, section_information=""):
-        initial_index = section_information.find("Prerequisite(s):")
+    def parse_additional_credit_data(self, section_information=""):
+        initial_index = section_information.find("Precludes additional credit for ")
         if initial_index == -1:
-            return None
-        initial_index+=len("Prerequisite(s):")
+            return []
+        initial_index+=len("Precludes additional credit for ")
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
+        prereqs = prereqs.split(", ")
         return prereqs
