@@ -37,6 +37,32 @@ class DataParser:
             
         return values
     
+
+    def parse_days(self,section_information=""):
+        days_dict ={
+            "Mon":"Monday",
+            "Tue":"Tuesday",
+            "Wed":"Wednesday",
+            "Thu":"Thursday",
+            "Fri":"Friday",
+            "Sat":"Saturday",
+            "Sun":"Sunday",
+        }
+
+        if(section_information==""):
+            raise ValueError("No day information was found")
+
+        days_arr = section_information.split(" ")
+
+        #This is at most O(7) because only seven days in a week
+        for x in range(len(days_arr)):
+            if (not(days_arr[x] in days_dict)):
+                raise ValueError(f"Could not find {days_arr[x]} inside days")
+            
+            days_arr[x]=days_dict[days_arr[x]]
+
+        return days_arr
+
     def parse_time(self, time=""):
         
         # If there is no list of words, meaning empty string was passed in
@@ -56,3 +82,4 @@ class DataParser:
         values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
         return values
+
