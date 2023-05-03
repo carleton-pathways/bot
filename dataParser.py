@@ -56,3 +56,39 @@ class DataParser:
         values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
         return values
+    
+    def parse_prereqs(self, description=""):
+
+        if (description == ""):
+            raise ValueError("Empty string passed")
+        
+        initial_index = description.find("Prerequisite(s):")
+
+        if initial_index == -1:
+            return None
+        
+        initial_index += len("Prerequisite(s):")
+
+        end_index = description.find(".", initial_index)
+
+        prereqs = description[initial_index:end_index]
+
+        prereqs = prereqs.split("and")
+
+        values = []
+
+        for prereq in prereqs:
+            values.append(prereq.split("or"))
+
+        for i in range(len(values)):
+            for j in range(len(values[i])):
+                values[i][j] = values[i][j].replace("iiii)", '').replace("iii)", '').replace("ii)", '').replace("i)", '').replace("(", '').replace(")", '').replace(";", '')
+                if ( "equivalent" in values[i][j]):
+                    values[i][j] = "EQ"
+                if ("permission" in values[i][j]):
+                    values[i][j] = "PM"
+                if ("with a minimum" in values[i][j]):
+                    values[i][j] = values[i][j][:values[i][j].find("with a minimum")]
+                values[i][j] = values[i][j].strip()
+
+        return values
