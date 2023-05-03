@@ -38,22 +38,36 @@ class DataParser:
     # takes in a string which would represent a data containing an exlusion or inclusion
     # array contains the subject and whether it is excluded or included
 
-    def parseRestrictionExclusion(dataString):
-        result = []
-        if (dataString == "{None}"):
-            return "null"
+    def parseRestrictionExclusion(self, dataString=""):
+        if (dataString == ""):
+            raise ValueError("Empty string passed")
 
-        bracketIndex = dataString.index("(")
-        result.append(dataString[:bracketIndex])
-        result.append(dataString[bracketIndex+1:-1])
+        if ("{None}" in dataString):
+            return None
+
+        data = dataString.split("\n")
+        result = []
+        for x in data:
+
+            bracketIndex = x.index("(")
+            result.append([x[:bracketIndex], x[bracketIndex+1:-1]])
+
         return result
 
-    def parseInstructor(instructor):
+    def parseInstructor(self, instructor=""):
+        if (instructor == ""):
+            raise ValueError("Empty string passed")
+
         result = []
-        if (instructor == "{None}"):
-            return "null"
+        if ("{None}" in instructor):
+            return None
 
         bracketIndex = instructor.index("(")
         result.append(instructor[:bracketIndex])
         result.append(instructor[bracketIndex+1:-1])
         return result
+
+
+p = DataParser()
+print(p.parseRestrictionExclusion("""First Year Undergraduate (Exclude)
+Second Year Undergraduate (Exclude)"""))
