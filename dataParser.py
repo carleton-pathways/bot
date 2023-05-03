@@ -143,18 +143,20 @@ class DataParser:
         return values
 
     
-    def parse_prereq_data(self, section_information=""):
-        initial_index = section_information.find("Prerequisite(s):")
+    def parse_additional_credit_data(self, section_information=""):
+        if section_information=="":
+            raise ValueError("empty string")
+        initial_index = section_information.find("Precludes additional credit for ")
         if initial_index == -1:
-            return None
-        initial_index+=len("Prerequisite(s):")
+            return []
+        initial_index+=len("Precludes additional credit for ")
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
-        pattern = re.compile(r"[A-Z]{4}\s\d{4}")
-        course_codes = pattern.findall(section_information)
-        values = {}
-        values["courses"] = course_codes
-        values["string"] = prereqs
 
-        return values
+        prereqs = prereqs.split(", ")
 
+        for i in range(len(prereqs)):
+            if (" (this course is no longer" in prereqs[i]):
+                prereqs[i] = prereqs[i][:prereqs[i].find(" (this course is no longer")]
+
+        return prereqs
