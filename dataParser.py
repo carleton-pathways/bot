@@ -60,16 +60,20 @@ class DataParser:
         meeting_dates= {}
 
         #Extracts Months and days and year from the String
-        year = meeting_times[8:12]
-
+        start_year = meeting_times[8:12]
         start_month = meeting_times[0:3]
         start_day = meeting_times[4:6]
-        
-        end_month = meeting_times[-7:-4]
-        end_day = meeting_times[-3:-1]
     
+
+
+        end_month = meeting_times[-12:-9]
+        end_day = meeting_times[-8:-6]
+        end_year = meeting_times[-4:]
+
+  
+
         #Chekcs if we acutally found the correct dates and months
-        if(not((start_month in months_dict) & (start_day.isnumeric()) & (end_month in months_dict) & (end_day.isnumeric())& year.isnumeric())):
+        if(not((start_month in months_dict) & (start_day.isnumeric()) & (end_month in months_dict) & (end_day.isnumeric())& start_year.isnumeric() &end_year.isnumeric)):
             raise  ValueError("String does not follow the proper format")
 
         #Converts the Months string into its integer 
@@ -77,14 +81,14 @@ class DataParser:
         end_month = months_dict[end_month]
 
         #Sets the each start and end date to pydatetime
-        start_date = datetime.datetime(int(year), start_month, int(start_day))
-        end_date = datetime.datetime(int(year), end_month, int(end_day))
+        start_date = datetime.datetime(int(start_year), start_month, int(start_day))
+        end_date = datetime.datetime(int(end_year), end_month, int(end_day))
       
         #Puts the each date into the dictionary      
         meeting_dates["start_date"]=start_date
         meeting_dates["end_date"]=end_date
 
-
+      
         return meeting_dates
 
 
