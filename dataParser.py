@@ -41,7 +41,7 @@ class DataParser:
     # takes in a string which would represent a data containing an exlusion or inclusion
     # array contains the subject and whether it is excluded or included
 
-    def parseRestrictionExclusion(self, dataString=""):
+    def parse_restriction_exclusion(self, dataString=""):
         if (dataString == ""):
             raise ValueError("Empty string passed")
 
@@ -57,7 +57,7 @@ class DataParser:
 
         return result
 
-    def parseInstructor(self, instructor=""):
+    def parse_instructor(self, instructor=""):
         if (instructor == ""):
             raise ValueError("Empty string passed")
 
@@ -83,8 +83,7 @@ class DataParser:
             "Sep": 9,
             "Oct": 10,
             "Nov": 11,
-            "Dec":12
-            
+            "Dec":12,
             }
    
         # If there is no list of words, meaning empty string was passed in
@@ -125,11 +124,12 @@ class DataParser:
       
         return meeting_dates
 
-
-
-
     def parse_days(self,section_information=""):
-        days_dict ={
+
+        if(section_information==""):
+            raise ValueError("No day information was found")
+        
+        days_dict = {
             "Mon":"Monday",
             "Tue":"Tuesday",
             "Wed":"Wednesday",
@@ -138,9 +138,6 @@ class DataParser:
             "Sat":"Saturday",
             "Sun":"Sunday",
         }
-
-        if(section_information==""):
-            raise ValueError("No day information was found")
 
         days_arr = section_information.split(" ")
 
@@ -172,14 +169,17 @@ class DataParser:
         values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
         return values
-
     
     def parse_additional_credit_data(self, section_information=""):
+
         if section_information=="":
             raise ValueError("empty string")
+        
         initial_index = section_information.find("Precludes additional credit for ")
+
         if initial_index == -1:
             return []
+        
         initial_index+=len("Precludes additional credit for ")
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
@@ -191,3 +191,25 @@ class DataParser:
                 prereqs[i] = prereqs[i][:prereqs[i].find(" (this course is no longer")]
 
         return prereqs
+    
+    def parse_prereq_data(self, section_information=""):
+
+        if (section_information == ""):
+            raise ValueError("empty string")
+        
+        initial_index = section_information.find("Prerequisite(s):")
+
+        if initial_index == -1:
+            return None
+        
+        initial_index+=len("Prerequisite(s):")
+
+        end_index = section_information.find(".", initial_index)
+        prereqs = section_information[initial_index:end_index]
+        pattern = re.compile(r"[A-Z]{4}\s\d{4}")
+        course_codes = pattern.findall(section_information)
+        values = {}
+        values["courses"] = course_codes
+        values["string"] = prereqs
+
+        return values
