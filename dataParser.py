@@ -65,4 +65,11 @@ class DataParser:
         initial_index+=len("Prerequisite(s):")
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
-        return prereqs
+        pattern = re.compile(r"[A-Z]{4}\s\d{4}")
+        course_codes = pattern.findall(section_information)
+        values = {}
+        values["courses"] = course_codes
+        values["string"] = prereqs
+
+        return values
+    
