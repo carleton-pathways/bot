@@ -5,15 +5,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.webdriver.common.by import By
 import pandas as pd
-import sqlalchemy
-from sqlalchemy import create_engine
-from sqlalchemy import text
-
-
-
-START_CRN = 30000
-END_CRN = 30010
-
+# import sqlalchemy
+# from sqlalchemy import create_engine
+# from sqlalchemy import text
 
 def main():
 
@@ -33,21 +27,21 @@ def main():
         "urlValue": 202230,
         "validCRNs": [],
         "startCRN": 30000,
-        "endCRN" : 30010,
+        "endCRN" : 39999,
         },
         {
         "name": "Winter2023",
         "urlValue": 202310,
         "validCRNs": [],
         "startCRN": 10000,
-        "endCRN" : 10010,
+        "endCRN" : 19999,
         },
         {
         "name": "Summer2023",
         "urlValue": 202320,
         "validCRNs": [],
         "startCRN": 20000,
-        "endCRN" : 20010,
+        "endCRN" : 29999,
         },
     ]
 
@@ -72,7 +66,7 @@ def main():
         # print(term["validCRNs"])
         # print(df)
     # df.to_sql('crns', con=engine, if_exists='replace')
-    print(df.head())
+    # print(df.head())
     df.to_csv("crns.csv", index=False)
 
     # with engine.connect() as conn:
