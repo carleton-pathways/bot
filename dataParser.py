@@ -3,8 +3,40 @@ import re
 
 class DataParser: 
 
+    def parse(self, term="", info="", **kwargs):
+        
+        if (term == ""):
+            raise ValueError("Empty string passed")
+        if (info == ""):
+            raise ValueError("Empty string passed")
+        
+        parse_n = ["subject", "course_description", "meeting_date", "days", "time", "instructor", 'year_in_program', 'level_restriction', 'degree_restriction', 
+                   'major_restriction', 'program_restrictions', 'department_restriction', 'faculty_restriction']
+        
+        if (term not in parse_n):
+            return [info]
+        elif (term == "subject"):
+            return self.parse_subject(info)
+        elif (term == "course_description"):
+            if (kwargs.get('additional_credit')):
+                return self.parse_additional_credit_data(info)
+            else:
+                return self.parse_prereq_data(info)
+        elif (term == "meeting_date"):
+            return self.parse_meeting_times(info)
+        elif (term == "days"):
+            return self.parse_days(info)
+        elif (term == "time"):
+            return self.parse_time(info)
+        elif (term == "instructor"):
+            return self.parse_instructor(info)
+        elif (term in ['year_in_program', 'level_restriction', 'degree_restriction', 'major_restriction', 'program_restrictions', 'department_restriction', 'faculty_restriction']):
+            return self.parse_restriction_exclusion(info)
+        
+
+
     # takes in a string of the course title and return a dictionary
-    def parse_section_information(self, section_information=""):
+    def parse_subject(self, section_information=""):
 
         # Split into list of words
         words = section_information.split()
@@ -16,25 +48,18 @@ class DataParser:
         # If there is only one word, meaning either not the full string was passed in or the string had no
         if (len(words) <= 1):
             raise ValueError("No spaces in string passed")
-
-        keys = ["faculty", "course_code", "section", "tut_id"]
-        values = {}
+        
+        values = [None, None, None, None, ]
 
         for i in range(len(words)):
             if (i == 2 and len(words[i]) >= 2):
-                values["section"] = words[i][0]
-                values["tut_id"] = words[i][1]
+                values[2] = words[i][0]
+                values[3] = words[i][1]
             elif (i == 2 and len(words[i]) == 1):
-                values["section"] = words[i][0]
-                values["tut_id"] = None
+                values[2] = words[i][0]
+                values[3] = None
             else:
-                values[keys[i]] = words[i]
-
-        # If section or tut_id not set, set them to None
-        if ("section" not in values):
-            values["section"] = None
-        if ("tut_id" not in values):
-            values["tut_id"] = None
+                values[i] = words[i]
 
         return values
 
@@ -46,16 +71,16 @@ class DataParser:
             raise ValueError("Empty string passed")
 
         if ("{None}" in dataString):
-            return None
+            return [None]
 
         data = dataString.split("\n")
         result = []
         for x in data:
 
             bracketIndex = x.index("(")
-            result.append([x[:bracketIndex], x[bracketIndex+1:-1]])
+            result.append([(x[:bracketIndex]).strip(), x[bracketIndex+1:-1]])
 
-        return result
+        return [result]
 
     def parse_instructor(self, instructor=""):
         if (instructor == ""):
@@ -63,11 +88,12 @@ class DataParser:
 
         result = []
         if ("{None}" in instructor):
-            return None
+            return [None]
 
         bracketIndex = instructor.index("(")
-        result.append(instructor[:bracketIndex])
+        result.append((instructor[:bracketIndex]).strip())
         result.append(instructor[bracketIndex+1:-1])
+
         return result
 
     def parse_meeting_times(self, meeting_times=""):
@@ -90,23 +116,19 @@ class DataParser:
         if (len(meeting_times)==0):
             raise ValueError("Empty string passed")
         
-        meeting_dates= {}
+        meeting_dates= [None, None]
 
         #Extracts Months and days and year from the String
         start_year = meeting_times[8:12]
         start_month = meeting_times[0:3]
         start_day = meeting_times[4:6]
-    
-
 
         end_month = meeting_times[-12:-9]
         end_day = meeting_times[-8:-6]
         end_year = meeting_times[-4:]
 
-  
-
         #Chekcs if we acutally found the correct dates and months
-        if(not((start_month in months_dict) & (start_day.isnumeric()) & (end_month in months_dict) & (end_day.isnumeric())& start_year.isnumeric() &end_year.isnumeric)):
+        if(not((start_month in months_dict) and (start_day.isnumeric()) and (end_month in months_dict) and (end_day.isnumeric()) and (start_year.isnumeric()) and (end_year.isnumeric))):
             raise  ValueError("String does not follow the proper format")
 
         #Converts the Months string into its integer 
@@ -118,10 +140,9 @@ class DataParser:
         end_date = datetime.datetime(int(end_year), end_month, int(end_day))
       
         #Puts the each date into the dictionary      
-        meeting_dates["start_date"]=start_date
-        meeting_dates["end_date"]=end_date
+        meeting_dates[0]=start_date
+        meeting_dates[1]=end_date
 
-      
         return meeting_dates
 
     def parse_days(self,section_information=""):
@@ -148,7 +169,7 @@ class DataParser:
             
             days_arr[x]=days_dict[days_arr[x]]
 
-        return days_arr
+        return [days_arr]
 
     def parse_time(self, time=""):
         
@@ -164,9 +185,9 @@ class DataParser:
         
         times = [time.strip() for time in times]
 
-        values = {}
-        values["start_time"] = datetime.time(int(times[0].split(":")[0]), int(times[0].split(":")[1]), 0, 0)
-        values["end_time"] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
+        values = [None, None]
+        values[0] = datetime.time(int(times[0].split(":")[0]), int(times[0].split(":")[1]), 0, 0)
+        values[1] = datetime.time(int(times[1].split(":")[0]), int(times[1].split(":")[1]), 0, 0)
         
         return values
     
@@ -178,38 +199,43 @@ class DataParser:
         initial_index = section_information.find("Precludes additional credit for ")
 
         if initial_index == -1:
-            return []
+            return [None]
         
         initial_index+=len("Precludes additional credit for ")
         end_index = section_information.find(".", initial_index)
         prereqs = section_information[initial_index:end_index]
 
-        prereqs = prereqs.split(", ")
+        pattern = re.compile(r"[A-Z]{4}\s\d{4}")
+        
+        course_codes = pattern.findall(prereqs)
+      
+        values = [None, None]
+        values[0] = "Precludes additional credit for " + prereqs
+        values[1] = course_codes
 
-        for i in range(len(prereqs)):
-            if (" (this course is no longer" in prereqs[i]):
-                prereqs[i] = prereqs[i][:prereqs[i].find(" (this course is no longer")]
-
-        return prereqs
+        return values
     
     def parse_prereq_data(self, section_information=""):
 
         if (section_information == ""):
-            raise ValueError("empty string")
+            raise ValueError("empty string passed in")
         
-        initial_index = section_information.find("Prerequisite(s):")
+        initial_index = section_information.find("Prerequisite(s): ")
 
         if initial_index == -1:
-            return None
+            return [None]
         
-        initial_index+=len("Prerequisite(s):")
-
+        initial_index+=len("Prerequisite(s): ")
         end_index = section_information.find(".", initial_index)
+
         prereqs = section_information[initial_index:end_index]
+
         pattern = re.compile(r"[A-Z]{4}\s\d{4}")
-        course_codes = pattern.findall(section_information)
-        values = {}
-        values["courses"] = course_codes
-        values["string"] = prereqs
+
+        course_codes = pattern.findall(prereqs)
+        values = [None, None]
+        values[0] = "Prerequisite(s): " + prereqs
+        values[1] = course_codes
+        
 
         return values
