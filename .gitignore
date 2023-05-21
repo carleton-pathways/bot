@@ -1,1 +1,5 @@
 crns.csv
+__pycache__
+course_data.csv
+__pycache__/
+__pycache__\
