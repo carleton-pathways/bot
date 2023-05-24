@@ -6,9 +6,7 @@ class DataParser:
     def parse(self, term="", info="", **kwargs):
         
         if (term == ""):
-            raise ValueError("Empty string passed")
-        if (info == ""):
-            raise ValueError("Empty string passed")
+            raise ValueError("Empty term passed")
         
         parse_n = ["subject", "course_description", "meeting_date", "days", "time", "instructor", 'year_in_program', 'level_restriction', 'degree_restriction', 
                    'major_restriction', 'program_restrictions', 'department_restriction', 'faculty_restriction']
@@ -18,10 +16,7 @@ class DataParser:
         elif (term == "subject"):
             return self.parse_subject(info)
         elif (term == "course_description"):
-            if (kwargs.get('additional_credit')):
-                return self.parse_additional_credit_data(info)
-            else:
-                return self.parse_prereq_data(info)
+            return [info] + self.parse_additional_credit_data(info) + self.parse_prereq_data(info)
         elif (term == "meeting_date"):
             return self.parse_meeting_times(info)
         elif (term == "days"):
@@ -43,7 +38,7 @@ class DataParser:
 
         # If there is no list of words, meaning empty string was passed in
         if (not words):
-            raise ValueError("Empty string passed")
+            return [None, None, None, None, ]
 
         # If there is only one word, meaning either not the full string was passed in or the string had no
         if (len(words) <= 1):
@@ -68,7 +63,7 @@ class DataParser:
 
     def parse_restriction_exclusion(self, dataString=""):
         if (dataString == ""):
-            raise ValueError("Empty string passed")
+            return [None]
 
         if ("{None}" in dataString):
             return [None]
@@ -84,15 +79,16 @@ class DataParser:
 
     def parse_instructor(self, instructor=""):
         if (instructor == ""):
-            raise ValueError("Empty string passed")
+            return [None, None]
 
-        result = []
         if ("{None}" in instructor):
-            return [None]
+            return [None, None]
+        
+        result = [None, None]
 
         bracketIndex = instructor.index("(")
-        result.append((instructor[:bracketIndex]).strip())
-        result.append(instructor[bracketIndex+1:-1])
+        result[0] = ((instructor[:bracketIndex]).strip())
+        result[1] = (instructor[bracketIndex+1:-1])
 
         return result
 
@@ -114,7 +110,7 @@ class DataParser:
    
         # If there is no list of words, meaning empty string was passed in
         if (len(meeting_times)==0):
-            raise ValueError("Empty string passed")
+            return [None, None]
         
         meeting_dates= [None, None]
 
@@ -148,7 +144,7 @@ class DataParser:
     def parse_days(self,section_information=""):
 
         if(section_information==""):
-            raise ValueError("No day information was found")
+            return [[]]
         
         days_dict = {
             "Mon":"Monday",
@@ -175,7 +171,7 @@ class DataParser:
         
         # If there is no list of words, meaning empty string was passed in
         if (time == ""):
-            raise ValueError("Empty string passed")
+            return [None, None]
         
         times = time.split("-")
 
@@ -194,12 +190,12 @@ class DataParser:
     def parse_additional_credit_data(self, section_information=""):
 
         if section_information=="":
-            raise ValueError("empty string")
+            return [None, None]
         
         initial_index = section_information.find("Precludes additional credit for ")
 
         if initial_index == -1:
-            return [None]
+            return [None, None]
         
         initial_index+=len("Precludes additional credit for ")
         end_index = section_information.find(".", initial_index)
@@ -218,12 +214,12 @@ class DataParser:
     def parse_prereq_data(self, section_information=""):
 
         if (section_information == ""):
-            raise ValueError("empty string passed in")
+            return [None, None]
         
         initial_index = section_information.find("Prerequisite(s): ")
 
         if initial_index == -1:
-            return [None]
+            return [None, None]
         
         initial_index+=len("Prerequisite(s): ")
         end_index = section_information.find(".", initial_index)
@@ -237,5 +233,4 @@ class DataParser:
         values[0] = "Prerequisite(s): " + prereqs
         values[1] = course_codes
         
-
         return values
