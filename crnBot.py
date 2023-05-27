@@ -6,6 +6,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import pandas as pd
 
+
+from pymongo import MongoClient
+import csv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 URL_FIRST = "https://central.carleton.ca/prod/bwysched.p_display_course?wsea_code=EXT&term_code="
 URL_SECOND = "&disp=18292988&crn="
 
@@ -54,6 +60,36 @@ def main():
         df.loc[len(df)] = [term["urlValue"], term["validCRNs"]]
 
     df.to_csv("crns.csv", index=False)
+
+    #Pass in URI of MongoDB
+    save_csv_to_mongo("")
+
+
+def save_csv_to_mongo(uri):
+    if uri == "":
+        raise ValueError("Please enter URI to mongo")
+    
+    #Connects to the Mongo client
+    client = MongoClient(uri, server_api=ServerApi('1'))
+    try:
+        #Specifies what Database and collection to add to
+        client.admin.command('ping')
+        database = client['CarletonPathwaysDB']
+        collection = database['courses']
+
+        #Opens CSV and adds to MongoDB
+        with open("crns.csv", 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                collection.insert_one(row)
+
+        print("Sucessfully connected and inserted data")
+        
+    except Exception as e:
+        print(e)
+
+    client.close() 
+
 
 if __name__ == "__main__":
     main()
