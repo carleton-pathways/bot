@@ -75,7 +75,7 @@ def save_csv_to_mongo(uri):
         #Specifies what Database and collection to add to
         client.admin.command('ping')
         database = client['CarletonPathwaysDB']
-        collection = database['courses']
+        collection = database['crns']
 
         #Opens CSV and adds to MongoDB
         with open("crns.csv", 'r') as file:
