@@ -7,7 +7,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from ast import literal_eval
 import dataParser
-
+from pymongo import MongoClient
+import csv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 URL_FIRST = "https://central.carleton.ca/prod/bwysched.p_display_course?wsea_code=EXT&term_code="
 URL_SECOND = "&disp=18292988&crn="
 
