@@ -3,3 +3,4 @@ __pycache__
 course_data.csv
 __pycache__/
 __pycache__\
+.env
