@@ -11,6 +11,7 @@ from pymongo import MongoClient
 import csv
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+
 URL_FIRST = "https://central.carleton.ca/prod/bwysched.p_display_course?wsea_code=EXT&term_code="
 URL_SECOND = "&disp=18292988&crn="
 
@@ -32,7 +33,6 @@ class DataBot:
     parser = dataParser.DataParser()
 
     def __init__(self):
-        
         options = Options()
         options.add_experimental_option("detach", True)
 
@@ -77,5 +77,7 @@ class DataBot:
             for crn in row['crns']:
                 self.driver.get(URL_FIRST + str(row['termCode']) + URL_SECOND + str(crn))
                 self.df.loc[len( self.df)] = self.scrape()
+
+        self.driver.close()
                 
         self.df.to_csv(COURSE_DATA_CSV_PATH, index=False)

@@ -28,8 +28,6 @@ class DataParser:
         elif (term in ['year_in_program', 'level_restriction', 'degree_restriction', 'major_restriction', 'program_restrictions', 'department_restriction', 'faculty_restriction']):
             return self.parse_restriction_exclusion(info)
         
-
-
     # takes in a string of the course title and return a dictionary
     def parse_subject(self, section_information=""):
 

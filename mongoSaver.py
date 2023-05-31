@@ -1,0 +1,37 @@
+from pymongo import MongoClient
+import csv
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+import os
+from dotenv import load_dotenv
+
+DB_NAME = 'CarletonPathwaysDB'
+
+class MongoSaver:
+    def __init__(self):
+        load_dotenv()
+
+        #Connects to the Mongo client
+        self.client = MongoClient(os.getenv('URI'), server_api=ServerApi('1'))
+        
+    def save_csv_to_mongo(self, collection_name, csv_path): 
+        try:
+            #Specifies what Database and collection to add to
+            self.client.admin.command('ping')
+            database = self.client[DB_NAME]
+            collection = database[collection_name]
+
+            #Opens CSV and adds to MongoDB
+            with open(csv_path, 'r') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    collection.insert_one(row)
+
+            print("Sucessfully connected and inserted data")
+            
+        except Exception as e:
+            print(e)
+
+    def close_mongo_connection(self):
+        self.client.close() 
