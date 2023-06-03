@@ -16,14 +16,14 @@ class MongoSaver:
         self.client = MongoClient(os.getenv('URI'), server_api=ServerApi('1'))
         
     def save_csv_to_mongo(self, collection_name, csv_path): 
+        
+        #Specifies what Database and collection to add to
+        self.client.admin.command('ping')
+        database = self.client[DB_NAME]
+        collection = database[collection_name]
         try:
-            #Specifies what Database and collection to add to
-            self.client.admin.command('ping')
-            database = self.client[DB_NAME]
-            collection = database[collection_name]
-
             #Opens CSV and adds to MongoDB
-            with open(csv_path, 'r') as file:
+            with open(csv_path, 'r',encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     collection.insert_one(row)
