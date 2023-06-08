@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
@@ -48,7 +49,11 @@ class DataBot:
         
         # finds everything in first table
         for i in range(0, 16):
-            text = self.driver.find_element(By.XPATH, "//td[contains(., '%s:')]//following-sibling::td"%(self.TERM_ARRAY[i])).text
+            try:
+                text = self.driver.find_element(By.XPATH, "//td[contains(., '%s:')]//following-sibling::td"%(self.TERM_ARRAY[i])).text
+            except NoSuchElementException:
+                #If the <td> tag contains no children (text) then set text to empty string
+                text=  ""
             term = (self.TERM_ARRAY[i].replace(" ", "_")).lower()
             info.extend(self.parser.parse(term, text))
 
