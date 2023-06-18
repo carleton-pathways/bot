@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from ast import literal_eval
 import dataParser
+import time
 from pymongo import MongoClient
 import csv
 from pymongo.mongo_client import MongoClient
@@ -38,6 +39,8 @@ class DataBot:
         options.add_experimental_option("detach", True)
 
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+     
+        
 
     def scrape(self):
         
@@ -75,12 +78,30 @@ class DataBot:
         return info
 
     def run(self):
+        retry_count=0
         crns = pd.read_csv(CRN_CSV_PATH)
         crns.crns = crns.crns.apply(literal_eval)
 
         for index, row in crns.iterrows():
             for crn in row['crns']:
                 self.driver.get(URL_FIRST + str(row['termCode']) + URL_SECOND + str(crn))
+
+                #Fetches reponse status of the webpage to check for Internal Server Error
+                response_status= self.driver.execute_script('return window.performance.getEntries()[0]["responseStatus"]')
+
+                #If we get a server error, we will retry the webpage after 3 minutes to see if the server is back
+                #Capped at 5 
+                while (response_status ==500):
+                    retry_count+=1
+                    time.sleep(180)
+                    self.driver.refresh()
+                    response_status= self.driver.execute_script('return window.performance.getEntries()[0]["responseStatus"]')
+
+                    if(retry_count ==5):
+                        print("Timed Out.", (URL_FIRST + str(row['termCode']) + URL_SECOND + str(crn)), " Could not be reached after 5 attempted Reloads. Stopped at crn",crn)
+                        return
+
+                
                 self.df.loc[len( self.df)] = self.scrape()
 
         self.driver.close()
