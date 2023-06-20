@@ -33,5 +33,25 @@ class MongoSaver:
         except Exception as e:
             print(e)
 
+    def delete_all(self):
+        # Access the desired database
+        database = self.client[DB_NAME]
+
+        # Access the collection
+        collection = database["crns"]
+
+        # Delete all documents in the collection
+        collection.delete_many({})
+        
+        # Access the collection
+        collection = database["courses"]
+
+        # Delete all documents in the collection
+        collection.delete_many({})
+
+        print("Deleted all documents in Courses and Crns")
+    
+
+
     def close_mongo_connection(self):
         self.client.close() 
